@@ -1,9 +1,11 @@
 const initialState = {
   breakCount : 5,
+  longBreakCount : 15,
   sessionCount : 25,
   clockCount : 25*60,
   currentTimer : "Session",
-  isPlaying : false
+  isPlaying : false,
+  pomodoroCount : 0
 }
 
 const backgroundStyle = [
@@ -22,6 +24,8 @@ class App extends React.Component {
       this.handleSessionIncrease = this.handleSessionIncrease.bind(this);
       this.handleBreakDecrease = this.handleBreakDecrease.bind(this);
       this.handleBreakIncrease = this.handleBreakIncrease.bind(this);
+      this.handleLongBreakDecrease = this.handleLongBreakDecrease.bind(this);
+      this.handleLongBreakIncrease = this.handleLongBreakIncrease.bind(this);
       this.setClockCount = this.setClockCount.bind(this);
     }
 
@@ -37,26 +41,30 @@ class App extends React.Component {
 
       else {
         this.loop = setInterval(() => {
-          const {clockCount,breakCount,sessionCount,currentTimer} = this.state;
+          const {clockCount,breakCount, longBreakCount, sessionCount,currentTimer,pomodoroCount} = this.state;
+          /*COUNTDOWN PER 1 SECOND*/
           if(clockCount > 0) {
             this.setState((state) => ({
               clockCount : state.clockCount - 1
             }));
           }
 
+          /*WHEN TIMER REACHES ZERO*/
           else {
             if (currentTimer === "Session") {
               $("body").css("backgroundImage",backgroundStyle[1]);
               this.setState((state) => ({
-                currentTimer : "Break",
-                clockCount : breakCount * 60
+                currentTimer : state.pomodoroCount < 3 ? "Short Break" : "Long Break",
+                clockCount : state.pomodoroCount < 3 ? breakCount * 60 : longBreakCount * 60,
+                pomodoroCount : state.pomodoroCount + 1
               }));
             }
             else {
               $("body").css("backgroundImage",backgroundStyle[0]);
               this.setState((state) => ({
                 currentTimer : "Session",
-                clockCount : sessionCount * 60
+                clockCount : sessionCount * 60,
+                pomodoroCount : state.pomodoroCount >= 4 ? 0 : state.pomodoroCount
               }));
             }
             this.audioBeep.play();
@@ -107,7 +115,7 @@ class App extends React.Component {
         this.setState((state) => ({
           breakCount : state.breakCount - 1
         }));
-        if (currentTimer === "Break") {
+        if (currentTimer === "Short Break") {
           this.setClockCount((breakCount - 1) * 60);
         }
       }
@@ -119,8 +127,32 @@ class App extends React.Component {
         this.setState((state) => ({
           breakCount : state.breakCount + 1
         }));
-        if (currentTimer === "Break") {
+        if (currentTimer === "Short Break") {
           this.setClockCount((breakCount + 1) * 60);
+        }
+      }
+    }
+
+    handleLongBreakDecrease() {
+      const {longBreakCount,currentTimer,isPlaying} = this.state;
+      if (longBreakCount > 1 && isPlaying == false) {
+        this.setState((state) => ({
+          longBreakCount : state.longBreakCount - 1
+        }));
+        if (currentTimer === "Long Break") {
+          this.setClockCount((longBreakCount - 1) * 60);
+        }
+      }
+    }
+
+    handleLongBreakIncrease() {
+      const {longBreakCount,currentTimer,isPlaying} = this.state;
+      if (longBreakCount < 60 && isPlaying == false) {
+        this.setState((state) => ({
+          longBreakCount : state.longBreakCount + 1
+        }));
+        if (currentTimer === "Long Break") {
+          this.setClockCount((longBreakCount + 1) * 60);
         }
       }
     }
@@ -136,7 +168,7 @@ class App extends React.Component {
     }
     
     render() {
-      const {breakCount, sessionCount, clockCount, currentTimer, isPlaying} = this.state;
+      const {breakCount, longBreakCount, sessionCount, clockCount, currentTimer, isPlaying, pomodoroCount} = this.state;
       const sessionProps = {
         setterLabel : "Session Length",
         count : sessionCount,
@@ -149,7 +181,7 @@ class App extends React.Component {
       }
 
       const breakProps = {
-        setterLabel : "Break Length",
+        setterLabel : "Short Break Length",
         count : breakCount,
         setterID : "break-label",
         decrementID : "break-decrement",
@@ -157,6 +189,17 @@ class App extends React.Component {
         counterID : "break-length",
         handleDecrease : this.handleBreakDecrease,
         handleIncrease : this.handleBreakIncrease
+      }
+
+      const longBreakProps = {
+        setterLabel : "Long Break Length",
+        count : longBreakCount,
+        setterID : "long-break-label",
+        decrementID : "long-break-decrement",
+        incrementID : "long-break-increment",
+        counterID : "long-break-length",
+        handleDecrease : this.handleLongBreakDecrease,
+        handleIncrease : this.handleLongBreakIncrease
       }
 
       return(
@@ -168,8 +211,10 @@ class App extends React.Component {
           <div id="set-container">
             <SetTimer {...sessionProps}/>
             <SetTimer {...breakProps}/>
+            <SetTimer {...longBreakProps}/>
           </div>
           <Clock clockLabel={currentTimer} clockCount={clockCount} handlePlayPause={this.handlePlayPause} handleReset={this.handleReset} isPlaying={isPlaying}/>
+          <PomodoroCounter pomodoroCount={pomodoroCount}/>
           <audio id="beep" preload="auto" ref={(audio) => {
             this.audioBeep = audio;
             }} src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
@@ -227,5 +272,30 @@ class Clock extends React.Component {
       );
   }
 }
+
+class PomodoroCounter extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    const {pomodoroCount} = this.props;
+    return(
+    <div id="pomodoro-count">
+      Pomodoro Count: {pomodoroCount} {String.fromCharCode(160)}
+      {
+        [...Array(pomodoroCount)].map((tomato,index) => <TomatoImage key={index}/>)
+      }
+    </div>
+    );
+  }
+}
+
+const TomatoImage = () => {
+  return(
+  <img className="tomato-pic" src="https://pngimg.com/uploads/tomato/tomato_PNG12592.png" alt="tomato picture"/>
+  );
+}
+
   
-  ReactDOM.render(<App/>,document.getElementById("root"));
+ReactDOM.render(<App/>,document.getElementById("root"));

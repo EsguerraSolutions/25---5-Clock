@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Readex+Pro&display=swap");
 @font-face {
   font-family: "Digital";
   src: url("//db.onlinewebfonts.com/t/8e22783d707ad140bffe18b2a3812529.eot");
@@ -22,27 +22,100 @@
 
 body {
   background-image: linear-gradient(to right, #ffecd2 0%, #fcb69f 100%);
-  background-size: cover;
-  font-family: "Fira Sans", sans-serif;
+  font-family: "Readex Pro", sans-serif;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
-#container {
-  min-height: 100vh;
-}
+/*SETTING LAYOUT*/
 
 #container,
 .set-timer,
-#clock-container {
+#clock-container,
+#set-container,
+.buttons-container {
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
 #set-container,
 .buttons-container {
-  display: flex;
   flex-direction: row;
-  align-items: center;
-  justify-content: center;
+}
+
+#set-container {
+  flex-wrap: wrap;
+}
+
+#container,
+.set-timer,
+#clock-container {
+  flex-direction: column;
+}
+
+#container {
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 10px;
+  width: 100%;
+  max-width: 380px;
+  border-radius: 20px;
+  margin: auto;
+}
+
+/*HEADER*/
+#header {
+  text-align: center;
+  line-height: 0.6em;
+}
+
+#header h1 {
+  font-weight: bold;
+  font-size: 2em;
+  text-shadow: 0.5px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/*LENGTH SETTERS*/
+
+.set-timer {
+  margin: 10px;
+  width: 160px;
+}
+
+.counter-length {
+  font-size: 2em;
+  width: 1.5em;
+  text-align: center;
+}
+
+.setter-label {
+  font-size: 1.2em;
+}
+
+button {
+  margin: 0 10px;
+  width: 2.6em;
+  text-align: center;
+}
+
+/* CLOCK */
+
+#clock-container {
+  width: 150px;
+}
+
+#timer-label {
+  font-size: 1.5em;
+  margin: 0px;
+}
+
+#time-left {
+  font-family: "Digital", sans-serif;
+  font-weight: bold;
+  font-size: 3em;
+  padding: 0px;
+  text-align: center;
 }

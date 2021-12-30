@@ -6,6 +6,11 @@ const initialState = {
   isPlaying : false
 }
 
+const backgroundStyle = [
+  "linear-gradient(to right, #ffecd2 0%, #fcb69f 100%)"
+  ,"linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)"
+]
+
 class App extends React.Component {
     constructor(props) {
       super(props);
@@ -32,7 +37,7 @@ class App extends React.Component {
 
       else {
         this.loop = setInterval(() => {
-          const {clockCount,breakCount,sessionCount} = this.state;
+          const {clockCount,breakCount,sessionCount,currentTimer} = this.state;
           if(clockCount > 0) {
             this.setState((state) => ({
               clockCount : state.clockCount - 1
@@ -40,10 +45,20 @@ class App extends React.Component {
           }
 
           else {
-            this.setState((state) => ({
-              currentTimer : (state.currentTimer === "Session") ? "Break" : "Session",
-              clockCount : (state.currentTimer === "Session") ? breakCount * 60 : sessionCount * 60
-            }));
+            if (currentTimer === "Session") {
+              $("body").css("backgroundImage",backgroundStyle[1]);
+              this.setState((state) => ({
+                currentTimer : "Break",
+                clockCount : breakCount * 60
+              }));
+            }
+            else {
+              $("body").css("backgroundImage",backgroundStyle[0]);
+              this.setState((state) => ({
+                currentTimer : "Session",
+                clockCount : sessionCount * 60
+              }));
+            }
             this.audioBeep.play();
           }
         },1000);
@@ -59,6 +74,7 @@ class App extends React.Component {
       this.setState(initialState);
       this.audioBeep.pause();
       this.audioBeep.currentTime = 0;
+      $("body").css("backgroundImage",backgroundStyle[0]);
     }
 
     handleSessionDecrease() {
@@ -144,7 +160,11 @@ class App extends React.Component {
       }
 
       return(
-        <div id="container">
+        <div id="container" className="animate__animated animate__zoomInDown">
+          <div id="header">
+            <h1>25 + 5 Clock</h1>
+            <p>Coded by Jonathan</p>
+          </div>
           <div id="set-container">
             <SetTimer {...sessionProps}/>
             <SetTimer {...breakProps}/>
@@ -168,11 +188,11 @@ class SetTimer extends React.Component {
         const {setterLabel,count,setterID,decrementID,incrementID,counterID,handleIncrease,handleDecrease} = this.props;
         return(
         <div className="set-timer">
-            <h1 id={setterID}>{setterLabel}</h1>
+            <h2 className="setter-label" id={setterID}>{setterLabel}</h2>
             <div className="buttons-container">
-                <button id={decrementID} onClick={handleDecrease}><i class="fas fa-minus"></i></button>
-                <span id={counterID}>{count}</span>
-                <button id={incrementID} onClick={handleIncrease}><i class="fas fa-plus"></i></button>
+                <button type="button" className="btn btn-primary" id={decrementID} onClick={handleDecrease}><i class="fas fa-minus"></i></button>
+                <span id={counterID} className="counter-length">{count}</span>
+                <button type="button" className="btn btn-primary" id={incrementID} onClick={handleIncrease}><i class="fas fa-plus"></i></button>
             </div>
         </div>
         );
@@ -197,11 +217,11 @@ class Clock extends React.Component {
       const {clockLabel,clockCount,handlePlayPause,handleReset,isPlaying} = this.props;
       return(
       <div id="clock-container">
-          <h1 id="timer-label">{clockLabel}</h1>
+          <h2 id="timer-label">{clockLabel}</h2>
           <div id="time-left">{this.convertToTime(clockCount)}</div>
           <div className="buttons-container">
-              <button id="start_stop" onClick={handlePlayPause}><i className={`fas fa-${isPlaying ? "pause":"play"}`}></i></button>
-              <button id="reset" onClick={handleReset}><i className="fas fa-redo"></i></button>
+              <button type="button" className="btn btn-primary" id="start_stop" onClick={handlePlayPause}><i className={`fas fa-${isPlaying ? "pause":"play"}`}></i></button>
+              <button type="button" className="btn btn-primary" id="reset" onClick={handleReset}><i className="fas fa-redo"></i></button>
           </div>
       </div>
       );

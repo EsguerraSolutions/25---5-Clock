@@ -72,7 +72,7 @@ class App extends React.Component {
             this.audioBeep.play();
             clearInterval(this.loop);
           }
-        },20);
+        },1000);
 
         this.setState({
           isPlaying : true

@@ -56,7 +56,8 @@ class App extends React.Component {
               this.setState((state) => ({
                 currentTimer : state.pomodoroCount < 3 ? "Short Break" : "Long Break",
                 clockCount : state.pomodoroCount < 3 ? breakCount * 60 : longBreakCount * 60,
-                pomodoroCount : state.pomodoroCount + 1
+                pomodoroCount : state.pomodoroCount + 1,
+                isPlaying: false
               }));
             }
             else {
@@ -64,12 +65,14 @@ class App extends React.Component {
               this.setState((state) => ({
                 currentTimer : "Session",
                 clockCount : sessionCount * 60,
-                pomodoroCount : state.pomodoroCount >= 4 ? 0 : state.pomodoroCount
+                pomodoroCount : state.pomodoroCount >= 4 ? 0 : state.pomodoroCount,
+                isPlaying: false
               }));
             }
             this.audioBeep.play();
+            clearInterval(this.loop);
           }
-        },1000);
+        },20);
 
         this.setState({
           isPlaying : true
